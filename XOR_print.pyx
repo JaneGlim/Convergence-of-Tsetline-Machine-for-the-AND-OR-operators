@@ -57,20 +57,40 @@ cdef class TsetlinMachine:
 
 
     # Calculate the output of each clause using the actions of each Tsetline Automaton.
-    # Output is stored an internal output array.
-    cdef void calculate_clause_output(self, int[:] X):
-        cdef int j, k
+    # Output is stored an internal output array. 
+    # We need to handle the value of empty clause. It is different for training and testing. We must specify. LJ 18/11/2024
+    cdef void calculate_clause_output(self, int[:] X, train):
+        cdef int j, k, num_ex
 
-        for j in xrange(self.number_of_clauses):                
-            self.clause_output[j] = 1
-            for k in xrange(self.number_of_features):
-                action_include = self.action(self.ta_state[j,k,0])
-                action_include_negated = self.action(self.ta_state[j,k,1])
+        if train == True:
+            for j in xrange(self.number_of_clauses):
+                self.clause_output[j] = 1
+                for k in xrange(self.number_of_features):
+                    action_include = self.action(self.ta_state[j,k,0])
+                    action_include_negated = self.action(self.ta_state[j,k,1])
+    
+                    if (action_include == 1 and X[k] == 0) or (action_include_negated == 1 and X[k] == 1):
+                        self.clause_output[j] = 0
+                        break
+                    
+        if train == False:
+            for j in xrange(self.number_of_clauses):
+                self.clause_output[j] = 1
+                num_ex = 0
+                for k in xrange(self.number_of_features):
+                    action_include = self.action(self.ta_state[j,k,0])
+                    action_include_negated = self.action(self.ta_state[j,k,1])
+                    if action_include == 1 or action_include_negated == 1:
+                        num_ex += 1
+    
+                    if (action_include == 1 and X[k] == 0) or (action_include_negated == 1 and X[k] == 1):
+                        self.clause_output[j] = 0
+                   
+                if num_ex == 0:
+                    self.clause_output[j] = 0                 
 
-                if (action_include == 1 and X[k] == 0) or (action_include_negated == 1 and X[k] == 1):
-                    self.clause_output[j] = 0
-                    break
-
+                    
+    
     ###########################################
     ### Predict Target Output y for Input X ###
     ###########################################
@@ -83,11 +103,11 @@ cdef class TsetlinMachine:
         ### Calculate Clause Output ###
         ###############################
 
-        self.calculate_clause_output(X)
+        self.calculate_clause_output(X, train=False)
 
         ###########################
         ### Sum up Clause Votes ###
-        ###########################
+        ###########################b
 
         output_sum = self.sum_up_clause_votes()
 
@@ -145,7 +165,7 @@ cdef class TsetlinMachine:
             for j in xrange(self.number_of_features):
                 Xi[j] = X[l,j]
 
-            self.calculate_clause_output(Xi)
+            self.calculate_clause_output(Xi, train=False)
 
             ###########################
             ### Sum up Clause Votes ###
@@ -177,7 +197,7 @@ cdef class TsetlinMachine:
         ### Calculate Clause Output ###
         ###############################
 
-        self.calculate_clause_output(X)
+        self.calculate_clause_output(X, train=True)
 
         ###########################
         ### Sum up Clause Votes ###
@@ -308,10 +328,10 @@ cdef class TsetlinMachine:
             for clauseindex in range(self.number_of_clauses):
                 for feature_index in [0,1]:
                     for feature_type in [0,1]: # 0 original, 1 negated
-                        ClauseOuts[print_index,epoch] = self.ta_state[clauseindex, feature_index, feature_type]
+                        ClauseOuts[print_index,epoch] = self.ta_state[clauseindex, feature_index, feature_type] # It includes the states of TAs, Clause number times feature number times 2. LJ 
                         print_index += 1
                 
-            ClauseOuts[print_index,epoch] = self.noofupdates
+            ClauseOuts[print_index,epoch] = self.noofupdates #the last colunm is the number of updates among all TAs. LJ
                 
         import xlsxwriter        
         workbooko = xlsxwriter.Workbook('Case OR Clause out per epoch T=2.xlsx')

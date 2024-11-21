@@ -51,7 +51,9 @@ def count_num_clause_in_one_epoch(clauses_in_one_epoch, states):
 
 
 
-df = pd.read_excel('../01AND E400Smp100T8S4C7.xlsx', header=None)
+# df = pd.read_excel('../01AND E400Smp100T8S4C7.xlsx', header=None)
+#df = pd.read_excel('Case OR Clause out per epoch T=2.xlsx', header=None)
+df = pd.read_excel('AND irrelevant C5_T2_S3_th_2 Epoch20 sample 20.xlsx', header=None)
 print(df.head())
 
 data = df.values
@@ -85,8 +87,8 @@ ax1[1].plot(data[:, -1])
 # ax1[1].legend()
 ax1[1].set_ylabel('The number of updates', fontsize='x-large')
 plt.xlabel('Epochs', fontsize='x-large')
-plt.savefig('../TM_AND_OR/01AND E400Smp100T8S4C7.eps')
-plt.savefig('../TM_AND_OR/01AND E400Smp100T8S4C7.pdf')
+# plt.savefig('../TM_AND_OR/01AND E400Smp100T8S4C7.eps')
+# plt.savefig('../TM_AND_OR/01AND E400Smp100T8S4C7.pdf')
 plt.show()
 
 print('end')
