@@ -14,37 +14,54 @@ Y = np.zeros([samples]).astype(dtype=np.int32)
 
 
 #######################
-#NOISE FREE BELOW #####
+#NOISE FREE BELOW: 10101 -> 1 #####
 #######################
 for i in range(samples):
     # noise free configuration
-    # if (X[i, :] == [1, 0, 1, 0, 1]).all(): # 10101 -> 1
-    #     Y[i] = 1
-
-    if (X[i, :4] == [1, 0, 1, 0]).all(): # 10101 or 10100 -> 1
+    if (X[i, :] == [1, 0, 1, 0, 1]).all(): # 10101 -> 1
         Y[i] = 1
 
-#######################
-#END: FREE BELOW #####
-#######################
-
-
-
-
-
 # Parameters for the Tsetlin Machine
-number_of_clauses = 5
-T = 2
+number_of_clauses = 3
+T = 5
 s = 3.0
-states = 100 # The state number of TA on each side of action (Include/Exclude). LJ
-Th = 2
+states = 100 # The state number of TA on each side of action (Include/Exclude)
+Th = 3
 
-
-# Parameters of the pattern recognition problem. The number of input Boolean numbers, X. LJ
+# Parameters of the pattern recognition problem. The number of input Boolean numbers
 number_of_features = 5
 
 # Training configuration
-epochs = 1000
+epochs = 2000
+#######################
+#END: NOISE FREE: 10101 -> 1#####
+#######################
+
+
+# #######################
+# #NOISE FREE BELOW: 10101 or 10100 -> 1 #####
+# #######################
+# for i in range(samples):
+#     # noise free configuration
+#     if (X[i, :4] == [1, 0, 1, 0]).all(): # 10101 or 10100 -> 1
+#         Y[i] = 1
+#
+# # Parameters for the Tsetlin Machine
+# number_of_clauses = 5
+# T = 2
+# s = 3.0
+# states = 100 # The state number of TA on each side of action (Include/Exclude)
+# Th = 2
+#
+# # Parameters of the pattern recognition problem. The number of input Boolean numbers
+# number_of_features = 5
+#
+# # Training configuration
+# epochs = 2000
+# #######################
+# #END: NOISE FREE: 10101 or 10100 -> 1 #####
+# #######################
+
 
 # Loading of training and test data
 NoOfTrainingSamples = len(X)*80//100
@@ -58,7 +75,7 @@ X_test = X[NoOfTrainingSamples:NoOfTrainingSamples+NoOfTestingSamples,:] # Input
 y_test = Y[NoOfTrainingSamples:NoOfTrainingSamples+NoOfTestingSamples] # Target value
 
 # This is a multiclass variant of the Tsetlin Machine, capable of distinguishing between multiple classes
-tsetlin_machine = XOR_print.TsetlinMachine(number_of_clauses, number_of_features, states, s, T, Th)
+tsetlin_machine = XOR_print_kbit.TsetlinMachine(number_of_clauses, number_of_features, states, s, T, Th)
 
 # Training of the Tsetlin Machine in batch mode. The Tsetlin Machine can also be trained online
 tsetlin_machine.fit(X_training, y_training, y_training.shape[0], epochs=epochs)
