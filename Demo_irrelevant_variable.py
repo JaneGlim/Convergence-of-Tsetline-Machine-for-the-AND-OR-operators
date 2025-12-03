@@ -80,11 +80,11 @@ for i in range(samples):
 T = 2
 s = 3.0
 number_of_clauses = 7
-states = 100 # The state number of TA on each side of action (Include/Exclude). LJ
+states = 100 # The state number of TA on each side of action (Include/Exclude).
 Th =2
 
 
-# Parameters of the pattern recognition problem. The number of input Boolean numbers, X. LJ
+# Parameters of the pattern recognition problem. The number of input Boolean numbers.
 number_of_features = 3
 
 # Training configuration
